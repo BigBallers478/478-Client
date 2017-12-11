@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <title>Register</title>
+</head>
+<body>
+    <form>
+        <div>
+            <label>email</label>
+            <input type="text" id="email" autofocus>
+        </div>
+        <div>
+            <label>name</label>
+            <input type="text" id="name" autofocus>
+        </div>
+        <div>
+            <label>Password</label>
+            <input type="password" id="password" autofocus>
+        </div>
+        <button type = "submit">Register</button>
+    </form>
+
+    <script>
+        const electron = require('electron');
+        const {ipcRenderer} = electron;
+        const https = require('https');
+        const fs = require('fs');
+        const path = require('path');
+        const querystring = require('querystring');
+
+        const form = document.querySelector('form');
+        form.addEventListener('submit', submitForm);
+
+        //function for submit form
+        function submitForm(e){
+            //by default submit form will submit to a file
+            //take even paramenter and prevent default
+            e.preventDefault();
+
+            const email = document.querySelector('#email').value;
+            const name = document.querySelector('#name').value;
+            const password = document.querySelector('#password').value;
+            const user = {'email':email, 'name':name, 'password':password};
+            //ipcRenderer.send('register:user', user);
+            //build the post string from an object
+            const post_data = querystring.stringify({'email':email, 'name':name, 'password':password});
+            
+            //an object of options to indicate where to post to
+            const post_options = {
+                host: 'bigballers.me',
+                port: '3000',
+                path: '/register',
+                method: 'POST', 
+                headers: {
+                    'Content-Type' : 'application/x-www-form-urlencoded',
+                    'Content-Length': Buffer.byteLength(post_data)
+                }
+            };
+            // send Post register
+            let post_req = https.request(post_options, function(res){
+                res.setEncoding('utf8');
+                res.on('data', function(chunk){
+                    console.log('Response: ' + chunk);               
+                });   
+            });
+        ipcRenderer.send('register:user', user);
+        //post the data
+        post_req.write(post_data);
+        post_req.end();
+        }
+    </script>
+</body>
+</html>

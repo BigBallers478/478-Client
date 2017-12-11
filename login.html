@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <title>Register</title>
+</head>
+<body>
+    <form>
+        <div>
+            <label>Username</label>
+            <input type="text" id="Username" autofocus>
+        </div>
+        <div>
+            <label>Password</label>
+            <input type="password" id="Password" autofocus>
+        </div>
+        <button type = "submit">Register</button>
+    </form>
+
+    <script>
+        const electron = require('electron');
+        const {ipcRenderer} = electron;
+
+        const form = document.querySelector('form');
+        form.addEventListener('submit', submitForm);
+
+        //function for submit form
+        function submitForm(e){
+            //by default submit form will submit to a file
+            //take even paramenter and prevent default
+            e.preventDefault();
+            const email = document.querySelector('#email').value;
+            const name = document.querySelector('#name').value;
+            const password = document.querySelector('#password').value;
+            const user = {'email':email, 'name':name, 'password':password};
+            //send user to main.js
+            ipcRenderer.send('login:user', user);
+        }
+    </script>
+</body>
+</html>
